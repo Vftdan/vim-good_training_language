@@ -131,7 +131,7 @@ function! indent#good_training_language#get_indent(lnum)
   let l:zero_delta_to = 0
   let l:lvl = indent(l:plnum)
   let l:prevline = getline(l:plnum)
-  if match(l:prevline, '\v^\s*(кц>|\))\s*$') >= 0
+  if match(l:prevline, '\v^\s*(кц>|\))%(\s*\;)?\s*$') >= 0
     let l:matching = s:get_matching_opening(l:plnum, match(l:prevline, '\v<кц>') + 1)
     let l:lvl -= shiftwidth()
     if l:matching[0] < 1
