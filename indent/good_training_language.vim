@@ -27,7 +27,7 @@ let s:LOOKUP_EXPECT_CLOSE = {
       \ }
 
 function! s:tokenize_line(s)
-  let l:token_ptn = '[«»()]|<нч>|<кц>|<то>|\;'
+  let l:token_ptn = '[«»()]|<нч>|<кц>|<то>|<про>|<если>|<пока>|<для>|\;|\/\/'
   let l:split_ptn = '\v%(' . l:token_ptn . ')@=|%(' . l:token_ptn . ')@<=|\/\*.{-}%(\*\/|$)|"%([^"\\]|\\.)*'
   return split(a:s, l:split_ptn)
 endfunction
@@ -65,7 +65,9 @@ function! s:get_delta(line, zero_delta_to)
       let l:delta += l:zero_delta_to
       let l:zero_delta_to = 0
     endif
-    if l:tok == 'то'
+    if l:tok == '//'
+      break
+    elseif l:tok == 'то'
       call add(l:inline_thens, l:delta)
       let l:delta += 1
     elseif len(l:inline_thens)
