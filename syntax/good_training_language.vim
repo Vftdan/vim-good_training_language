@@ -59,6 +59,7 @@ syn keyword goodtraininglanguageNewtypeKeyword структ
 syn keyword goodtraininglanguageBoollitKeyword истина ложь
 syn keyword goodtraininglanguageBitshiftKeyword лбс пбс
 syn keyword goodtraininglanguageArithmeticKeyword ост
+syn match goodtraininglanguageBuiltinFunction /\v<(печать|ввод|срез|сисвызов|размер|адрес)>(\s*\()@=/
 
 " Strings:
 syn region goodtraininglanguageDquoteString matchgroup=goodtraininglanguageQuote start='"' end='"' contains=@goodtraininglanguageStringContent
@@ -75,7 +76,7 @@ syn match goodtraininglanguageStringEscapeBackslashAfter /\v./ contained transpa
 
 " Numbers:
 syn match goodtraininglanguageHexInt /\v<16\%[0-9АБЦДЕФабцдеф]+/
-syn match goodtraininglanguageInteger /\v<[0-9]+/
+syn match goodtraininglanguageInteger /\v<[0-9]+(цел|нат8?)?/
 syn match goodtraininglanguageFloat /\v<[0-9]+\.([0-9]+|\ze[^.]|$)/
 
 " Variables & types:
@@ -83,12 +84,13 @@ syn match goodtraininglanguageTypedVar /\v\s*<.{-}>\s*\:\s*<.{-}>/ contained tra
 syn region goodtraininglanguageColonType contained matchgroup=goodtraininglanguageColon start=/\v\s*\:/ end=/\v[^[:space:]:]@<=/ transparent contains=@goodtraininglanguageType
 syn region goodtraininglanguageFuncSig contained matchgroup=goodtraininglanguageFuncNameParens start=/\v\s*<\S{-}>\s*\(/ end='\V)' transparent contains=goodtraininglanguageTypedVar,goodtraininglanguageComma nextgroup=goodtraininglanguageColonType
 syn cluster goodtraininglanguageType contains=goodtraininglanguagePrimitiveType,goodtraininglanguageGenericType
-syn match goodtraininglanguagePrimitiveType /\v<[^[:punct:][:space:]]{-}>/ contained contains=goodtraininglanguageBuiltinType
-syn region goodtraininglanguageGenericType start=/\v<[^[:punct:][:space:]]{-}>\s*\(/ end='\V)' contained contains=@goodtraininglanguageType
+syn match goodtraininglanguagePrimitiveType /\v\s*<[^[:punct:][:space:]]{-}>/ contained contains=goodtraininglanguageBuiltinType
+syn region goodtraininglanguageGenericType start=/\v\s*<[^[:punct:][:space:]]{-}>\s*\(/ end='\V)' contained contains=@goodtraininglanguageType
 syn keyword goodtraininglanguageBuiltinType цел нат нат8 вещ строка лог массив срез contained
 
 " Operators:
 syn match goodtraininglanguageArithmeticOp /\v[+-/*]/
+syn match goodtraininglanguageBoolOp /\v\!/
 syn region goodtraininglanguageNestingParenthesisBody matchgroup=goodtraininglanguageNestingParenthesis start='(' end=')' transparent
 syn region goodtraininglanguageCallingParenthesisBody matchgroup=goodtraininglanguageCallingParenthesis start=/\v%(%([^[:punct:][:space:]]|\))\s*)@<=\(/ end=')' transparent
 syn match goodtraininglanguageFieldOp '\V.'
@@ -99,8 +101,9 @@ syn match goodtraininglanguageAssignment '\V:='
 syn match goodtraininglanguageComparisonOp /\v[+-]\?\=?|\!?\=/
 
 " Comments:
-syn region goodtraininglanguageBlockComment start="\V/*" end="\V*/"
-syn region goodtraininglanguageLineComment start="\V//" end=/\v$/ keepend
+syn keyword goodtraininglanguageTodo TODO FIXME СДЕЛАТЬ contained
+syn region goodtraininglanguageBlockComment start="\V/*" end="\V*/" contains=goodtraininglanguageTodo
+syn region goodtraininglanguageLineComment start="\V//" end=/\v$/ keepend contains=goodtraininglanguageTodo
 
 GoodTrainingLanguageHiLink goodtraininglanguageBlockComment goodtraininglanguageComment
 GoodTrainingLanguageHiLink goodtraininglanguageLineComment goodtraininglanguageComment
@@ -111,16 +114,17 @@ GoodTrainingLanguageHiLink goodtraininglanguageSwitchKeyword goodtraininglanguag
 GoodTrainingLanguageHiLink goodtraininglanguageCaseKeyword goodtraininglanguageLabel
 GoodTrainingLanguageHiLink goodtraininglanguageDefaultKeyword goodtraininglanguageLabel
 GoodTrainingLanguageHiLink goodtraininglanguageBlockKeyword goodtraininglanguageKeyword
-GoodTrainingLanguageHiLink goodtraininglanguageDeclarationKeyword goodtraininglanguageKeyword
+GoodTrainingLanguageHiLink goodtraininglanguageDeclarationKeyword goodtraininglanguageStorageClass
 GoodTrainingLanguageHiLink goodtraininglanguageReturnKeyword goodtraininglanguageKeyword
 GoodTrainingLanguageHiLink goodtraininglanguageBoolopKeyword goodtraininglanguageOperator
-GoodTrainingLanguageHiLink goodtraininglanguageCaseKeyword goodtraininglanguageOperator
+GoodTrainingLanguageHiLink goodtraininglanguageCastKeyword goodtraininglanguageOperator
 GoodTrainingLanguageHiLink goodtraininglanguageImportKeyword goodtraininglanguageInclude
 GoodTrainingLanguageHiLink goodtraininglanguageExternKeyword goodtraininglanguageKeyword
 GoodTrainingLanguageHiLink goodtraininglanguageNewtypeKeyword goodtraininglanguageNewtype
 GoodTrainingLanguageHiLink goodtraininglanguageBoollitKeyword goodtraininglanguageBoolean
 GoodTrainingLanguageHiLink goodtraininglanguageBitshiftKeyword goodtraininglanguageOperator
 GoodTrainingLanguageHiLink goodtraininglanguageArithmeticKeyword goodtraininglanguageOperator
+GoodTrainingLanguageHiLink goodtraininglanguageBuiltinFunction goodtraininglanguageOperator
 GoodTrainingLanguageHiLink goodtraininglanguageDquoteString goodtraininglanguageString
 GoodTrainingLanguageHiLink goodtraininglanguageAngquoteString goodtraininglanguageString
 GoodTrainingLanguageHiLink goodtraininglanguageStringInvalidEscape goodtraininglanguageError
@@ -143,10 +147,13 @@ call s:hi_link_first(['goodtraininglanguageComma'], ['Comma', 'Delimiter'])
 call s:hi_link_first(['goodtraininglanguageSemicolon'], ['Semicolon', 'Statement'])
 GoodTrainingLanguageHiLink goodtraininglanguageComparisonOp Operator
 GoodTrainingLanguageHiLink goodtraininglanguageArithmeticOp Operator
+GoodTrainingLanguageHiLink goodtraininglanguageBoolOp Operator
 GoodTrainingLanguageHiLink goodtraininglanguageRangeOp Repeat
 
+GoodTrainingLanguageHiLink goodtraininglanguageTodo Todo
 GoodTrainingLanguageHiLink goodtraininglanguageComment Comment
 GoodTrainingLanguageHiLink goodtraininglanguageKeyword Keyword
+GoodTrainingLanguageHiLink goodtraininglanguageStorageClass StorageClass
 GoodTrainingLanguageHiLink goodtraininglanguageRepeat Repeat
 GoodTrainingLanguageHiLink goodtraininglanguageConditional Conditional
 GoodTrainingLanguageHiLink goodtraininglanguageLabel Label
