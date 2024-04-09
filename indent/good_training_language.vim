@@ -81,14 +81,14 @@ function! s:get_delta(line, zero_delta_to)
 endfunction
 
 function! s:get_matching_opening(lnum, col)
-    let l:view = winsaveview()
-    try
-      call cursor(a:lnum, a:col)
-      " TODO better detection of comments and strings
-      return searchpairpos('\<нч\>\|(', '', '\<кц\>\|)', 'bn', 'getline(".")[:col(".")] =~ ' . "'" . '\v\/\/|^.*%(\*\/)?%([^"«/]|\/\*@!|"%([^"\\]|\\.)*"|«%([^\\«»]|\\.|«[^»]*»)*»)%("%([^"\\]|\\.)*|«%([^\\«»]|\\.|«[^»]*»)*|\/\*%([^*]|\*\/@!)*)$' . "'")
-    finally
-      call winrestview(l:view)
-    endtry
+  let l:view = winsaveview()
+  try
+    call cursor(a:lnum, a:col)
+    " TODO better detection of comments and strings
+    return searchpairpos('\<нч\>\|(', '', '\<кц\>\|)', 'bn', 'getline(".")[:col(".")] =~ ' . "'" . '\v\/\/|^.*%(\*\/)?%([^"«/]|\/\*@!|"%([^"\\]|\\.)*"|«%([^\\«»]|\\.|«[^»]*»)*»)%("%([^"\\]|\\.)*|«%([^\\«»]|\\.|«[^»]*»)*|\/\*%([^*]|\*\/@!)*)$' . "'")
+  finally
+    call winrestview(l:view)
+  endtry
 endfunction
 
 function! indent#good_training_language#get_indent(lnum)
