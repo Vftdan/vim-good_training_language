@@ -34,6 +34,7 @@ endfunction
 
 function! s:get_delta(line, zero_delta_to)
   if a:line =~ '\v^\s*\/\/'
+    " Do not change indentation after comment lines
     return [0, 0]
   endif
   let l:tokens = s:tokenize_line(a:line)
@@ -41,6 +42,8 @@ function! s:get_delta(line, zero_delta_to)
   let l:zero_delta_to = a:zero_delta_to
   let l:in_block_prefix = v:false
   if match(a:line, '\v^\s*(кц>|\))') >= 0
+    " Line-initial closing token should be handled on the previous line
+    " (Should we add an option to use Ratliff style?)
     let l:delta += 1
   endif
   let l:expect_close = ''
@@ -55,6 +58,7 @@ function! s:get_delta(line, zero_delta_to)
           let l:delta = l:delta + get(s:LOOKUP_DELTA, l:tok, 0)
         endif
       elseif get(s:LOOKUP_EXPECT_CLOSE, l:tok, '') == l:expect_close
+        " Nested angular quote
         let l:expect_close_nesting += 1
       endif
       continue
@@ -85,6 +89,11 @@ function! s:get_delta(line, zero_delta_to)
       endif
     endif
   endfor
+  " if l:in_block_prefix
+  "   " Would need adjusting l:pprevline handling logic
+  "   " echom 'Resetting l:zero_delta_to in line: ' . a:line
+  "   let l:zero_delta_to = 0
+  " end
   return [l:delta, l:zero_delta_to]
 endfunction
 
@@ -101,8 +110,13 @@ endfunction
 
 function! indent#good_training_language#get_indent(lnum)
   let l:curline = getline(a:lnum)
+  " TODO: if match(l:curline, '\v^\s*иначе>') >= 0
+  "       It should look for the closest 'если' above
+  "       that is on the current nesting level
   if match(l:curline, '\v^\s*(кц>|\))') >= 0
     " Dedicated strategy:
+    " Take the indentation level of the line of the mathcing 'нч'/'('
+    " and calculate the nesting change til that opening token
     let l:matching = s:get_matching_opening(a:lnum, match(l:curline, '\v<кц>') + 1)
     if l:matching[0] < 1
       return 0
@@ -132,6 +146,11 @@ function! indent#good_training_language#get_indent(lnum)
   let l:lvl = indent(l:plnum)
   let l:prevline = getline(l:plnum)
   if match(l:prevline, '\v^\s*(кц>|\))%(\s*\;)?\s*$') >= 0
+    " Previous line only contains a closing token,
+    " so we ignore the contents of the corresponding region
+    " by considering pre-previous lines before the opening token
+    " and cancelling the future adjustment caused by the closing token
+    " by decreasing the indentation level
     let l:matching = s:get_matching_opening(l:plnum, match(l:prevline, '\v<кц>') + 1)
     let l:lvl -= shiftwidth()
     if l:matching[0] < 1
@@ -148,6 +167,13 @@ function! indent#good_training_language#get_indent(lnum)
   endif
 
   while match(l:pprevline, '\v<то\s*$') >= 0
+    " Each contiguous pre-previous lines that ended with a 'то' caused a
+    " one-level indentation for one statement, so now we may need to
+    " outdent back if we encounter statement end by seeing
+    " the delta changing from a positive value to zero
+    " TODO check how our code handles 'то' token in the middle of a line
+    "      the relevant code operates on the l:inline_thens variable
+    "      of the s:get_delta() function
     let l:zero_delta_to -= 1
     let l:pplnum = prevnonblank(l:pplnum - 1)
     if l:pplnum > 0
@@ -158,6 +184,12 @@ function! indent#good_training_language#get_indent(lnum)
   endwhile
   let [l:delta, l:zero_delta_to] = s:get_delta(l:prevline, l:zero_delta_to)
   if match(l:prevline, '\v^\s*(кц>|\))') >= 0
+    " If the previous line started with a closing token,
+    " it should have been already outdented by one level,
+    " so we need to cancel that outdent,
+    " but it could have followed 'то' tokens from pre-previous lines
+    " that only cause outdents starting from the current line,
+    " so we make this adjustment after the s:get_delta call
     let l:delta += 1
   endif
   if match(l:curline, '\v^\s*(кц>|\))') >= 0
@@ -165,6 +197,16 @@ function! indent#good_training_language#get_indent(lnum)
     let l:delta -= 1
   end
   if l:delta < 1
+    " Apply the outdents by 'то' tokens,
+    " but only detect statement end after we could have cancelled the extra
+    " outdent by a closing token at the beginning of the previous line
+    " to properly handle end-else(if)-begin and end-else(if)-then lines,
+    " because the block end is not the outer statement end in that case
+    " TODO also take this fact into account in other cases
+    "      this may be hard, because it often is cannot
+    "      be unambiguously mapped to a syntax tree anyway;
+    "      the compiler disambiguates it in a greedy fashion
+    "      by doing a token lookahead, so here it is handled correctly
     let l:delta += l:zero_delta_to
   endif
   let l:lvl = l:lvl + shiftwidth() * l:delta
