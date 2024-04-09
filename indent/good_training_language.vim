@@ -39,7 +39,7 @@ function! s:get_delta(line, zero_delta_to)
   let l:tokens = s:tokenize_line(a:line)
   let l:delta = 0
   let l:zero_delta_to = a:zero_delta_to
-  if match(a:line, '\v^\s*(кц>|\()') >= 0
+  if match(a:line, '\v^\s*(кц>|\))') >= 0
     let l:delta += 1
   endif
   let l:expect_close = ''
@@ -151,10 +151,10 @@ function! indent#good_training_language#get_indent(lnum)
     endif
   endwhile
   let [l:delta, l:zero_delta_to] = s:get_delta(l:prevline, l:zero_delta_to)
-  if match(l:prevline, '\v^\s*(кц>|\()') >= 0
+  if match(l:prevline, '\v^\s*(кц>|\))') >= 0
     let l:delta += 1
   endif
-  if match(l:curline, '\v^\s*(кц>|\()') >= 0
+  if match(l:curline, '\v^\s*(кц>|\))') >= 0
     " UNREACHABLE: should have been handled by a dedicated strategy
     let l:delta -= 1
   end
