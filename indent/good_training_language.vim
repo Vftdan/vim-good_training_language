@@ -102,23 +102,23 @@ endfunction
 function! indent#good_training_language#get_indent(lnum)
   let l:curline = getline(a:lnum)
   if match(l:curline, '\v^\s*(кц>|\))') >= 0
-    " Dedicated strategy
-      let l:matching = s:get_matching_opening(a:lnum, match(l:curline, '\v<кц>') + 1)
-      if l:matching[0] < 1
-        return 0
-      endif
-      let l:lvl = indent(l:matching[0])
-      " Excluding the matching 'нч'
-      let l:mline = substitute(getline(l:matching[0])[: l:matching[1]], '\v.$', '', '')
-      let [l:delta, l:zero_delta_to] = s:get_delta(l:mline, 0)
-      if l:delta < 1
-        let l:delta += l:zero_delta_to
-      endif
-      let l:lvl = l:lvl + shiftwidth() * l:delta
-      if l:lvl < 0
-        return 0
-      endif
-      return l:lvl
+    " Dedicated strategy:
+    let l:matching = s:get_matching_opening(a:lnum, match(l:curline, '\v<кц>') + 1)
+    if l:matching[0] < 1
+      return 0
+    endif
+    let l:lvl = indent(l:matching[0])
+    " Excluding the matching 'нч'
+    let l:mline = substitute(getline(l:matching[0]), '\v%>' . (l:matching[1] - 1) . 'c.*$', '', '')
+    let [l:delta, l:zero_delta_to] = s:get_delta(l:mline, 0)
+    if l:delta < 1
+      let l:delta += l:zero_delta_to
+    endif
+    let l:lvl = l:lvl + shiftwidth() * l:delta
+    if l:lvl < 0
+      return 0
+    endif
+    return l:lvl
   endif
 
   let l:plnum = prevnonblank(a:lnum - 1)
