@@ -10,6 +10,9 @@ let b:did_indent = 1
 setlocal indentexpr=indent#good_training_language#get_indent(v:lnum)
 setlocal indentkeys+=0=кц
 setlocal autoindent
+" 'indentkeys' doesn't seem to handle unicode properly
+inoreabbr <buffer> кц кц<C-F>
+inoremap <buffer> <expr> <CR> getline('.') =~ '\v^\s*кц>$' ? '<c-o>==<c-o>o' : '<cr>'
 
 let s:LOOKUP_DELTA = {
       \ 'нч': 1,
