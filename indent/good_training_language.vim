@@ -39,6 +39,7 @@ function! s:get_delta(line, zero_delta_to)
   let l:tokens = s:tokenize_line(a:line)
   let l:delta = 0
   let l:zero_delta_to = a:zero_delta_to
+  let l:in_block_prefix = v:false
   if match(a:line, '\v^\s*(кц>|\))') >= 0
     let l:delta += 1
   endif
@@ -61,10 +62,15 @@ function! s:get_delta(line, zero_delta_to)
     let l:delta = l:delta + get(s:LOOKUP_DELTA, l:tok, 0)
     let l:expect_close = get(s:LOOKUP_EXPECT_CLOSE, l:tok, '')
     let l:expect_close_nesting = 0
-    if get(s:LOOKUP_DELTA, l:tok, 0) < 0 && l:delta < 1
+    if !l:in_block_prefix && get(s:LOOKUP_DELTA, l:tok, 0) < 0 && l:delta < 1
       let l:delta += l:zero_delta_to
       let l:zero_delta_to = 0
     endif
+    if l:tok =~ '\v<про>|<если>|<пока>|<для>'
+      let l:in_block_prefix = v:true
+    elseif l:tok =~ '\v<то>|<нч>|\;'
+      let l:in_block_prefix = v:false
+    end
     if l:tok == '//'
       break
     elseif l:tok == 'то'
