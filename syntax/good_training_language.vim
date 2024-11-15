@@ -82,10 +82,10 @@ syn match goodtraininglanguageHexInt /\v<16\%[0-9АБЦДЕФабцдеф]+(це
 " Variables & types:
 syn match goodtraininglanguageTypedVar /\v\s*<.{-}>\s*\:\s*<.{-}>/ contained transparent contains=goodtraininglanguageColonType
 syn region goodtraininglanguageColonType contained matchgroup=goodtraininglanguageColon start=/\v\s*\:/ end=/\v[^[:space:]:]@<=/ transparent contains=@goodtraininglanguageType
-syn region goodtraininglanguageFuncSig contained matchgroup=goodtraininglanguageFuncNameParens start=/\v\s*<\S{-}>\s*\(/ end='\V)' transparent contains=goodtraininglanguageTypedVar,goodtraininglanguageComma nextgroup=goodtraininglanguageColonType
+syn region goodtraininglanguageFuncSig contained matchgroup=goodtraininglanguageFuncNameParens start=/\v\s*<\S{-}>\s*\(/ end='\V)' transparent contains=goodtraininglanguageTypedVar,goodtraininglanguageComma,@goodtraininglanguageComment nextgroup=goodtraininglanguageColonType
 syn cluster goodtraininglanguageType contains=goodtraininglanguagePrimitiveType,goodtraininglanguageGenericType
 syn match goodtraininglanguagePrimitiveType /\v\s*<[^[:punct:][:space:]]{-}>/ contained contains=goodtraininglanguageBuiltinType
-syn region goodtraininglanguageGenericType start=/\v\s*<[^[:punct:][:space:]]{-}>\s*\(/ end='\V)' contained contains=@goodtraininglanguageType
+syn region goodtraininglanguageGenericType start=/\v\s*<[^[:punct:][:space:]]{-}>\s*\(/ end='\V)' contained contains=@goodtraininglanguageType,@goodtraininglanguageComment
 syn keyword goodtraininglanguageBuiltinType цел нат нат8 вещ строка лог массив срез contained
 
 " Operators:
@@ -102,6 +102,7 @@ syn match goodtraininglanguageComparisonOp /\v[+-]\?\=?|\!?\=/
 
 " Comments:
 syn keyword goodtraininglanguageTodo TODO FIXME СДЕЛАТЬ contained
+syn cluster goodtraininglanguageComment contains=goodtraininglanguageBlockComment,goodtraininglanguageLineComment
 syn region goodtraininglanguageBlockComment start="\V/*" end="\V*/" contains=goodtraininglanguageTodo
 syn region goodtraininglanguageLineComment start="\V//" end=/\v$/ keepend contains=goodtraininglanguageTodo
 
