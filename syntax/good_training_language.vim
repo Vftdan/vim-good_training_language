@@ -75,9 +75,9 @@ syn match goodtraininglanguageStringEscapeBackslash '\\' contained nextgroup=goo
 syn match goodtraininglanguageStringEscapeBackslashAfter /\v./ contained transparent contains=NONE
 
 " Numbers:
-syn match goodtraininglanguageHexInt /\v<16\%[0-9АБЦДЕФабцдеф]+/
 syn match goodtraininglanguageInteger /\v<[0-9]+(цел|нат8?)?/
 syn match goodtraininglanguageFloat /\v<[0-9]+\.([0-9]+|\ze[^.]|$)/
+syn match goodtraininglanguageHexInt /\v<16\%[0-9АБЦДЕФабцдеф]+(цел|нат8?)?/
 
 " Variables & types:
 syn match goodtraininglanguageTypedVar /\v\s*<.{-}>\s*\:\s*<.{-}>/ contained transparent contains=goodtraininglanguageColonType
