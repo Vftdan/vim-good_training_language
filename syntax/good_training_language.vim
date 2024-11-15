@@ -55,7 +55,7 @@ syn keyword goodtraininglanguageBoolopKeyword и или либо не
 syn keyword goodtraininglanguageCastKeyword как nextgroup=@goodtraininglanguageType
 syn keyword goodtraininglanguageImportKeyword вкл библ
 syn keyword goodtraininglanguageExternKeyword внешняя
-syn keyword goodtraininglanguageNewtypeKeyword структ
+syn keyword goodtraininglanguageNewtypeKeyword структ nextgroup=goodtraininglanguageNewtypeName
 syn keyword goodtraininglanguageBoollitKeyword истина ложь
 syn keyword goodtraininglanguageBitshiftKeyword лбс пбс
 syn keyword goodtraininglanguageArithmeticKeyword ост
@@ -87,6 +87,10 @@ syn cluster goodtraininglanguageType contains=goodtraininglanguagePrimitiveType,
 syn match goodtraininglanguagePrimitiveType /\v\s*<[^[:punct:][:space:]]{-}>/ contained contains=goodtraininglanguageBuiltinType
 syn region goodtraininglanguageGenericType start=/\v\s*<[^[:punct:][:space:]]{-}>\s*\(/ end='\V)' contained contains=@goodtraininglanguageType,@goodtraininglanguageComment
 syn keyword goodtraininglanguageBuiltinType цел нат нат8 вещ строка лог массив срез contained
+syn region goodtraininglanguageNewtypeName contained start=/\v\_s*</ end=/\v>\_s*/ keepend contains=@goodtraininglanguageType nextgroup=@goodtraininglanguageNewtypeBody
+syn cluster goodtraininglanguageNewtypeBody contains=goodtraininglanguageNewtypeBlock,goodtraininglanguageNewtypeSingle
+syn region goodtraininglanguageNewtypeBlock contained matchgroup=goodtraininglanguageBlockKeyword start=/\v<нч>/ end=/\v<кц>/ contains=goodtraininglanguageTypedVar,goodtraininglanguageSemicolon,@goodtraininglanguageComment
+syn match goodtraininglanguageNewtypeSingle "\vто\_s*\s@!" contained transparent contains=goodtraininglanguageBlockKeyword nextgroup=goodtraininglanguageTypedVar
 
 " Operators:
 syn match goodtraininglanguageArithmeticOp /\v[+-/*]/
