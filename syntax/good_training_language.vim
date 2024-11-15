@@ -167,7 +167,7 @@ GoodTrainingLanguageHiLink goodtraininglanguageFloat Float
 GoodTrainingLanguageHiLink goodtraininglanguageQuote Quote
 GoodTrainingLanguageHiLink goodtraininglanguageError Error
 GoodTrainingLanguageHiLink goodtraininglanguageType Type
-call s:hi_link_first(['goodtraininglanguageBuiltinType'], ['BuiltinType', 'Type'])
+call s:hi_link_first(['goodtraininglanguageBuiltinType'], ['pythonBuiltinType', 'BuiltinType', 'Type'])
 
 delfunction s:hi_link_first
 delcommand GoodTrainingLanguageHiLink
